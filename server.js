@@ -55,7 +55,7 @@ app.delete("/api/logs", (req, res) => {
 });
 
 // 🔹 auto run every 30 minutes
-setInterval(fetchLog, 1 * 60 * 1000);
+setInterval(fetchLog, 10 * 1000);
 
 // 🔹 server start
 const PORT = 3000;
