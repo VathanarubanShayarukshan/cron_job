@@ -5,36 +5,42 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 
-// static UI serve பண்ண
+// 👉 static UI serve
 app.use(express.static(path.join(__dirname, "public")));
 
 let logs = [];
 
-// 🔹 API call function
+// 🔹 Hugging Face API URL
+const API_URL = "https://sayarukshan-remote-cmd.hf.space/run";
+
+// 🔹 function: API call செய்து log fetch பண்ண
 async function fetchLog() {
     try {
-        const res = await axios.post(
-            "https://sayarukshan-remote-cmd.hf.space/run",
-            { text: "log" }
-        );
+        console.log("⏳ Sending request to API...");
+
+        const res = await axios.post(API_URL, {
+            cmd: "log" // ✅ IMPORTANT FIX
+        });
+
+        console.log("✅ API Response:", res.data);
 
         const logEntry = {
             time: new Date().toLocaleString(),
-            response: res.data
+            data: res.data
         };
 
         logs.push(logEntry);
 
-        console.log("Log fetched ✅");
     } catch (err) {
-        console.error("Error ❌", err.message);
+        console.error("❌ ERROR:");
+        console.error(err.response?.data || err.message);
     }
 }
 
 // 🔹 manual trigger
 app.get("/api/run-log", async (req, res) => {
     await fetchLog();
-    res.json({ status: "Log fetched ✅" });
+    res.json({ status: "Log fetched & stored ✅" });
 });
 
 // 🔹 get logs
@@ -48,10 +54,10 @@ app.delete("/api/logs", (req, res) => {
     res.json({ status: "Logs cleared 🧹" });
 });
 
-// 🔹 auto fetch every 30 min
+// 🔹 auto run every 30 minutes
 setInterval(fetchLog, 30 * 60 * 1000);
 
-// 🔹 server
+// 🔹 server start
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running: http://localhost:${PORT}`);
