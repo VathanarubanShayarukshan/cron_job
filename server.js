@@ -57,6 +57,14 @@ app.delete("/api/logs", (req, res) => {
 // 🔹 auto run every 30 minutes
 setInterval(fetchLog, 1 * 1000);
 
+// auto.js
+const axios = require("axios");
+
+setInterval(async () => {
+    await axios.get("https://cron-job-six-tan.vercel.app/api/run-log");
+    console.log("Triggered");
+}, 10000);
+
 // 🔹 server start
 const PORT = 3000;
 app.listen(PORT, () => {
